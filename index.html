@@ -49,6 +49,7 @@
       <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
       <div class="add-form-row">
         <button class="add-form-button">Написать</button>
+        <button class="remove-form-button">Удалить последний комментарий</button>
       </div>
     </div>
   </div>
@@ -56,22 +57,44 @@
 
 <script>
   const addFormButton = document.querySelector('.add-form-button');
+  const removeCommentButton = document.querySelector('.remove-form-button');
   const comments = document.querySelector('.comments');
   const addFormName = document.querySelector('.add-form-name');
   const addFormText = document.querySelector('.add-form-text');
-  addFormButton.addEventListener('click', () => {
-    const date = () => {
-      let currentDate = new Date();
-      if (currentDate.getMonth() < 10) {
-        return currentDate.getDate() + '.' + ('0' + currentDate.getMonth()) + '.' + (String(currentDate.getUTCFullYear()).slice(2)) + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes()
-      } else {
-        return currentDate.getDate() + '.' + currentDate.getMonth() + '.' + (String(currentDate.getUTCFullYear()).slice(2)) + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes()
-      }
-    };
+  addFormButton.disabled = true;
+  addFormName.addEventListener('input', checkFilds)
+  addFormText.addEventListener('input', checkFilds)
+  function checkFilds() {
+    (addFormName.value != '' && addFormText.value != '') ? addFormButton.disabled = false : addFormButton.disabled = true;
+
+  }
+  function date() {
+    let currentDate = new Date();
+    let date = currentDate.getDate()
+    let month = currentDate.getMonth()
+    let year = String(currentDate.getUTCFullYear()).slice(2)
+    let hours = currentDate.getHours()
+    let minutes = currentDate.getMinutes()
+    if (currentDate.getDate() < 10) {
+      date = '0' + date;
+    }
+    if (currentDate.getMonth() < 10) {
+      month = '0' + month;
+    }
+    if (currentDate.getHours() < 10) {
+      hours = '0' + hours;
+    }
+    if (currentDate.getMinutes() < 10) {
+      minutes = '0' + minutes;
+    }
+    return date + '.' + month + '.' + year + ' ' + hours + ':' + minutes;
+  };
+  function pushComment() {
     if (addFormName.value === '' || addFormText.value === '') {
       return;
     } else {
-      const oldComments = comments.innerHTML;
+      date();
+      let oldComments = comments.innerHTML;
       comments.innerHTML = oldComments + `<li class="comment">
         <div class="comment-header">
           <div>${addFormName.value}</div>
@@ -89,13 +112,25 @@
           </div>
         </div>
       </li>`;
+      addFormText.value = '';
+      addFormName.value = '';
     }
-
+  }
+  function removeComment() {
+    if (comments.children.length <= 1) {
+      return;
+    } else {
+      comments.lastElementChild.remove();
+    }
+  }
+  addFormButton.addEventListener('click', pushComment);
+  removeCommentButton.addEventListener('click', removeComment);
+  document.addEventListener('keyup', (event) => {
+    if (event.keyCode === 13) {
+      pushComment();
+    }
   });
-
-  console.log(addFormText);
-
-
+  console.log();
 </script>
 
 </html>
