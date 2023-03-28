@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Проект "Комменты"</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -9,40 +12,6 @@
 <body>
   <div class="container">
     <ul class="comments">
-      <li class="comment">
-        <div class="comment-header">
-          <div>Глеб Фокин</div>
-          <div>12.02.22 12:18</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">
-            Это будет первый комментарий на этой странице
-          </div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">3</span>
-            <button class="like-button"></button>
-          </div>
-        </div>
-      </li>
-      <li class="comment">
-        <div class="comment-header">
-          <div>Варвара Н.</div>
-          <div>13.02.22 19:22</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">
-            Мне нравится как оформлена эта страница! ❤
-          </div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">75</span>
-            <button class="like-button -active-like"></button>
-          </div>
-        </div>
-      </li>
     </ul>
     <div class="add-form">
       <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
@@ -61,9 +30,127 @@
   const comments = document.querySelector('.comments');
   const addFormName = document.querySelector('.add-form-name');
   const addFormText = document.querySelector('.add-form-text');
+  const commentsArray = [{
+    name: 'Глеб Фокин',
+    date: '12.02.22 12:18',
+    text: 'Это будет первый комментарий на этой странице',
+    likes: 3,
+    likeStatus: ''
+  },
+  {
+    name: 'Варвара Н.',
+    date: '13.02.22 19:22',
+    text: 'Мне нравится как оформлена эта страница! ❤',
+    likes: 75,
+    likeStatus: ''
+  }
+  ];
+  console.log(commentsArray);
   addFormButton.disabled = true;
-  addFormName.addEventListener('input', checkFilds)
-  addFormText.addEventListener('input', checkFilds)
+  addFormName.addEventListener('input', checkFilds);
+  addFormText.addEventListener('input', checkFilds);
+  commentsRenderer();
+  function saveEventListener() {
+    const textArea = document.querySelector('.change-form-text')
+    const saveButton = document.querySelector('.save__button')
+    saveButton.addEventListener('click', () => {
+      const buttonIndex = saveButton.dataset.save;
+      commentsArray[buttonIndex].text = textArea.value;
+      commentsRenderer();
+    })
+  }
+  function editEventListener() {
+    const editButtons = document.querySelectorAll('.edit__button')
+    for (const editButton of editButtons) {
+      editButton.addEventListener('click', () => {
+        const buttonIndex = editButton.dataset.edit;
+        const newCommentsSet = commentsArray.map((comment, index) => {
+          if (Number(buttonIndex) === index) {
+            return `<li class="comment">
+        <div class="comment-header">
+          <div>${comment.name}</div>
+          <div>${comment.date}</div>
+        </div>
+        <div class="comment-body">
+          <textarea type="textarea" class="change-form-text" rows="4">${comment.text}</textarea>
+        </div>
+        <div class="comment-footer">
+          <button class="save__button" data-save='${index}'>Сохранить</button>
+          <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+          </div>
+        </div>
+      </li>`
+          } else {
+            return `<li class="comment">
+        <div class="comment-header">
+          <div>${comment.name}</div>
+          <div>${comment.date}</div>
+        </div>
+        <div class="comment-body">
+          <div class="comment-text">
+            ${comment.text}
+          </div>
+        </div>
+        <div class="comment-footer">
+          <button class="edit__button" data-edit='${index}'>Редактировать</button>
+          <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+          </div>
+        </div>
+      </li>`
+          }
+        }).join('');
+        comments.innerHTML = newCommentsSet;
+        saveEventListener();
+      });
+    }
+  }
+  function likeEventListener() {
+    const likeButtons = document.querySelectorAll('.like-button');
+    for (const likeButton of likeButtons) {
+      likeButton.addEventListener('click', () => {
+        const buttonIndex = likeButton.dataset.like;
+        if (commentsArray[buttonIndex].likeStatus === '') {
+          commentsArray[buttonIndex].likeStatus = '-active-like';
+          commentsArray[buttonIndex].likes = ++commentsArray[buttonIndex].likes;
+        } else {
+          commentsArray[buttonIndex].likeStatus = '';
+          commentsArray[buttonIndex].likes = --commentsArray[buttonIndex].likes;
+        }
+        commentsRenderer();
+      });
+    }
+
+  }
+  function commentsRenderer() {
+    const newCommentsSet = commentsArray.map((comment, index) => {
+      return `<li class="comment">
+        <div class="comment-header">
+          <div>${comment.name}</div>
+          <div>${comment.date}</div>
+        </div>
+        <div class="comment-body">
+          <div class="comment-text">
+            ${comment.text}
+          </div>
+        </div>
+        <div class="comment-footer">
+          <button class="edit__button" data-edit='${index}'>Редактировать</button>
+          <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+          </div>
+        </div>
+      </li>`
+
+    }).join('');
+    comments.innerHTML = newCommentsSet;
+    likeEventListener();
+    editEventListener();
+  }
   function checkFilds() {
     (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;  //Добавил удаление пробелов, чтобы пользователь не мог отправить сообщение из пробелов
 
@@ -93,28 +180,20 @@
     if (addFormName.value === '' || addFormText.value === '') {
       return;
     } else {
-      let oldComments = comments.innerHTML;
-      comments.innerHTML = oldComments + `<li class="comment">
-        <div class="comment-header">
-          <div>${addFormName.value}</div>
-          <div>${date()}</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">
-            ${addFormText.value}
-          </div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">0</span>
-            <button class="like-button"></button>
-          </div>
-        </div>
-      </li>`;
+      commentsArray.push(
+        {
+          name: addFormName.value,
+          date: date(),
+          text: addFormText.value,
+          likes: 0,
+          likeStatus: ''
+        }
+      )
       addFormText.value = '';
       addFormName.value = '';
       addFormButton.disabled = true;
     }
+    commentsRenderer();
   }
   function removeComment() {
     if (comments.children.length <= 1) {
@@ -130,7 +209,7 @@
       pushComment();
     }
   });
-  console.log();
+
 </script>
 
 </html>

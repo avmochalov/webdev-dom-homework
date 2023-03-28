@@ -50,7 +50,7 @@ body {
 
 .comment-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .comment-body {
@@ -132,6 +132,26 @@ body {
 
 .remove-form-button {
   margin-top: 24px;
+  font-size: 24px;
+  padding: 10px 20px;
+  background-color: #bcec30;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.edit__button {
+  font-size: 24px;
+  padding: 10px 20px;
+  background-color: #bcec30;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.save__button {
   font-size: 24px;
   padding: 10px 20px;
   background-color: #bcec30;
