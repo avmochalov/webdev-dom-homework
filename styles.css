@@ -60,6 +60,7 @@ body {
 
 .comment-text {
   font-size: 32px;
+  white-space: pre-line;
 }
 
 .likes {
@@ -75,6 +76,13 @@ body {
 .likes-counter {
   font-size: 26px;
   margin-right: 8px;
+}
+
+.quote {
+  background: #e6f2f2;
+  color: black;
+  font-style: italic;
+  font-size: 18px;
 }
 
 .like-button {

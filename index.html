@@ -50,23 +50,42 @@
   addFormName.addEventListener('input', checkFilds);
   addFormText.addEventListener('input', checkFilds);
   commentsRenderer();
+  function fixEditField() {
+    const editField = document.querySelector('.change-form-text');
+    editField.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+  }
+  function addCommentAnswerListener() {
+    const commentsList = document.querySelectorAll('.comment');
+    for (const comment of commentsList) {
+      comment.addEventListener('click', () => {
+        const commentIndex = comment.dataset.commentid;
+        addFormText.value = `QUOTE_BEGIN ${commentsArray[commentIndex].name}  \n  ${commentsArray[commentIndex].text} QUOTE_END`;
+      });
+    }
+  }
   function saveEventListener() {
-    const textArea = document.querySelector('.change-form-text')
-    const saveButton = document.querySelector('.save__button')
-    saveButton.addEventListener('click', () => {
+    const textArea = document.querySelector('.change-form-text');
+    const saveButton = document.querySelector('.save__button');
+    saveButton.addEventListener('click', (event) => {
+      event.stopPropagation();
       const buttonIndex = saveButton.dataset.save;
-      commentsArray[buttonIndex].text = textArea.value;
+      commentsArray[buttonIndex].text = textArea.value
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
       commentsRenderer();
     })
   }
   function editEventListener() {
     const editButtons = document.querySelectorAll('.edit__button')
     for (const editButton of editButtons) {
-      editButton.addEventListener('click', () => {
+      editButton.addEventListener('click', (event) => {
+        event.stopPropagation();
         const buttonIndex = editButton.dataset.edit;
         const newCommentsSet = commentsArray.map((comment, index) => {
           if (Number(buttonIndex) === index) {
-            return `<li class="comment">
+            return `<li class="comment" data-commentid='${index}'>
         <div class="comment-header">
           <div>${comment.name}</div>
           <div>${comment.date}</div>
@@ -83,7 +102,7 @@
         </div>
       </li>`
           } else {
-            return `<li class="comment">
+            return `<li class="comment" data-commentid='${index}'>
         <div class="comment-header">
           <div>${comment.name}</div>
           <div>${comment.date}</div>
@@ -104,14 +123,17 @@
           }
         }).join('');
         comments.innerHTML = newCommentsSet;
+        fixEditField();
         saveEventListener();
+        addCommentAnswerListener();
       });
     }
   }
   function likeEventListener() {
     const likeButtons = document.querySelectorAll('.like-button');
     for (const likeButton of likeButtons) {
-      likeButton.addEventListener('click', () => {
+      likeButton.addEventListener('click', (event) => {
+        event.stopPropagation();
         const buttonIndex = likeButton.dataset.like;
         if (commentsArray[buttonIndex].likeStatus === '') {
           commentsArray[buttonIndex].likeStatus = '-active-like';
@@ -127,7 +149,7 @@
   }
   function commentsRenderer() {
     const newCommentsSet = commentsArray.map((comment, index) => {
-      return `<li class="comment">
+      return `<li class="comment" data-commentid='${index}'>
         <div class="comment-header">
           <div>${comment.name}</div>
           <div>${comment.date}</div>
@@ -150,6 +172,7 @@
     comments.innerHTML = newCommentsSet;
     likeEventListener();
     editEventListener();
+    addCommentAnswerListener();
   }
   function checkFilds() {
     (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;  //Добавил удаление пробелов, чтобы пользователь не мог отправить сообщение из пробелов
@@ -182,9 +205,15 @@
     } else {
       commentsArray.push(
         {
-          name: addFormName.value,
+          name: addFormName.value
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;"),
           date: date(),
-          text: addFormText.value,
+          text: addFormText.value
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+            .replaceAll("QUOTE_END", "</div>"),
           likes: 0,
           likeStatus: ''
         }
