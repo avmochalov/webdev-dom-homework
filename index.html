@@ -268,14 +268,10 @@
     }
   }
   function initAddForm() {
-    const renderAddFormButton = document.querySelector('.add-form-button');
-    const renderAddFormName = document.querySelector('.add-form-name');
-    const renderAddFormText = document.querySelector('.add-form-text');
-    const renderRemoveCommentButton = document.querySelector('.remove-form-button');
-    addFormButton = renderAddFormButton;
-    addFormName = renderAddFormName;
-    addFormText = renderAddFormText;
-    removeCommentButton = renderRemoveCommentButton;
+    addFormButton = document.querySelector('.add-form-button');
+    addFormName = document.querySelector('.add-form-name');
+    addFormText = document.querySelector('.add-form-text');
+    removeCommentButton = document.querySelector('.remove-form-button');
     addFormButton.disabled = true;
     console.log(addFormButton);
     addFormName.addEventListener('input', checkFields);
