@@ -14,42 +14,65 @@
     <ul class="comments">
     </ul>
     <div class="add-form">
-      <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
-      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
-      <div class="add-form-row">
-        <button class="add-form-button">Написать</button>
-        <button class="remove-form-button">Удалить последний комментарий</button>
-      </div>
     </div>
+  </div>
   </div>
 </body>
 
 <script>
-  const addFormButton = document.querySelector('.add-form-button');
-  const removeCommentButton = document.querySelector('.remove-form-button');
+  let addFormButton = document.querySelector('.add-form-button');
+  let removeCommentButton = document.querySelector('.remove-form-button');
   const comments = document.querySelector('.comments');
-  const addFormName = document.querySelector('.add-form-name');
-  const addFormText = document.querySelector('.add-form-text');
-  const commentsArray = [{
-    name: 'Глеб Фокин',
-    date: '12.02.22 12:18',
-    text: 'Это будет первый комментарий на этой странице',
-    likes: 3,
-    likeStatus: ''
-  },
-  {
-    name: 'Варвара Н.',
-    date: '13.02.22 19:22',
-    text: 'Мне нравится как оформлена эта страница! ❤',
-    likes: 75,
-    likeStatus: ''
+  let addFormName = document.querySelector('.add-form-name');
+  let addFormText = document.querySelector('.add-form-text');
+  const addForm = document.querySelector('.add-form');
+  const api = 'https://webdev-hw-api.vercel.app/api/v1/alex-mochalov/comments';
+  let commentsArray = [];
+  let isLoading = false;
+  addFormRenderer();
+  initAddForm();
+  function getComment() {
+    const fetchPromise = fetch(api, {
+      method: 'GET'
+    });
+    fetchPromise.then((response) => {
+      const jsonPromise = response.json();
+      jsonPromise.then((responseData) => {
+        console.log(responseData);
+        const apiComments = responseData.comments.map((comment) => {
+          return {
+            name: comment.author.name,
+            date: date(comment.date),
+            text: comment.text,
+            likes: comment.likes,
+            isLiked: false,
+            likeStatus: ''
+          }
+        });
+        commentsArray = apiComments;
+        commentsRenderer();
+      });
+
+    });
   }
-  ];
+  getComment();
   console.log(commentsArray);
   addFormButton.disabled = true;
-  addFormName.addEventListener('input', checkFilds);
-  addFormText.addEventListener('input', checkFilds);
+  addFormName.addEventListener('input', checkFields);
+  addFormText.addEventListener('input', checkFields);
   commentsRenderer();
+  function addFormRenderer() {
+    if (isLoading === false) {
+      addForm.innerHTML = ` <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
+      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
+      <div class="add-form-row">
+        <button class="add-form-button">Написать</button>
+        <button class="remove-form-button">Удалить последний комментарий</button>
+      </div>`
+    } else {
+      addForm.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
+    }
+  }
   function fixEditField() {
     const editField = document.querySelector('.change-form-text');
     editField.addEventListener('click', (event) => {
@@ -97,7 +120,7 @@
           <button class="save__button" data-save='${index}'>Сохранить</button>
           <div class="likes">
             <span class="likes-counter">${comment.likes}</span>
-            <button class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+            <button class="like-button" data-like='${index}'></button>
           </div>
         </div>
       </li>`
@@ -116,7 +139,7 @@
           <button class="edit__button" data-edit='${index}'>Редактировать</button>
           <div class="likes">
             <span class="likes-counter">${comment.likes}</span>
-            <button class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+            <button class="like-button" data-like='${index}'></button>
           </div>
         </div>
       </li>`
@@ -174,14 +197,14 @@
     editEventListener();
     addCommentAnswerListener();
   }
-  function checkFilds() {
+  function checkFields() {
     (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;  //Добавил удаление пробелов, чтобы пользователь не мог отправить сообщение из пробелов
 
   }
-  function date() {
-    let currentDate = new Date();
-    let date = currentDate.getDate()
-    let month = currentDate.getMonth()
+  function date(apiDate) {
+    let currentDate = new Date(apiDate);
+    let date = currentDate.getDate();
+    let month = currentDate.getMonth() + 1;
     let year = String(currentDate.getUTCFullYear()).slice(2)
     let hours = currentDate.getHours()
     let minutes = currentDate.getMinutes()
@@ -203,21 +226,34 @@
     if (addFormName.value === '' || addFormText.value === '') {
       return;
     } else {
-      commentsArray.push(
-        {
-          name: addFormName.value
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;"),
-          date: date(),
+      isLoading = true;
+      addFormRenderer();
+      console.log(isLoading);
+      const fetchFamPromise = fetch(api, {
+        method: 'POST',
+        body: JSON.stringify({
           text: addFormText.value
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;")
             .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
             .replaceAll("QUOTE_END", "</div>"),
-          likes: 0,
-          likeStatus: ''
-        }
-      )
+          name: addFormName.value
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;"),
+        })
+      })
+        .then((response) => {
+          console.log(isLoading);
+          response.json()
+            .then((responseData) => {
+              console.log(responseData);
+              console.log(isLoading);
+            });
+          getComment();
+          isLoading = false;
+          addFormRenderer();
+          initAddForm();
+        });
       addFormText.value = '';
       addFormName.value = '';
       addFormButton.disabled = true;
@@ -230,6 +266,22 @@
     } else {
       comments.lastElementChild.remove();
     }
+  }
+  function initAddForm() {
+    const renderAddFormButton = document.querySelector('.add-form-button');
+    const renderAddFormName = document.querySelector('.add-form-name');
+    const renderAddFormText = document.querySelector('.add-form-text');
+    const renderRemoveCommentButton = document.querySelector('.remove-form-button');
+    addFormButton = renderAddFormButton;
+    addFormName = renderAddFormName;
+    addFormText = renderAddFormText;
+    removeCommentButton = renderRemoveCommentButton;
+    addFormButton.disabled = true;
+    console.log(addFormButton);
+    addFormName.addEventListener('input', checkFields);
+    addFormText.addEventListener('input', checkFields);
+    addFormButton.addEventListener('click', pushComment);
+    removeCommentButton.addEventListener('click', removeComment);
   }
   addFormButton.addEventListener('click', pushComment);
   removeCommentButton.addEventListener('click', removeComment);
