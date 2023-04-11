@@ -103,6 +103,11 @@ body {
   width: 120px;
 }
 
+.comments__loader {
+  height: 80px;
+  width: 120px;
+}
+
 .add-form {
   padding: 20px;
   margin-top: 48px;
