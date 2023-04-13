@@ -2,6 +2,27 @@ body {
   margin: 0;
 }
 
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(30deg);
+    ;
+  }
+
+  75% {
+    transform: rotate(-30deg);
+    ;
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+
 .container {
   font-family: Helvetica;
   color: #ffffff;
@@ -73,6 +94,10 @@ body {
   cursor: pointer;
 }
 
+.loading-like {
+  animation: rotating 2s linear infinite;
+}
+
 .likes-counter {
   font-size: 26px;
   margin-right: 8px;
@@ -99,6 +124,11 @@ body {
 
 .loader {
   margin-left: 218px;
+  height: 80px;
+  width: 120px;
+}
+
+.comments__loader {
   height: 80px;
   width: 120px;
 }
