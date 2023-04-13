@@ -26,6 +26,8 @@
   // const container = document.querySelector('.container');
   let addFormName;
   let addFormText;
+  let formNameValue = String();
+  let formTextValue = String();
   const addForm = document.querySelector('.add-form');
   const api = 'https://webdev-hw-api.vercel.app/api/v1/alex-mochalov/comments';
   let commentsArray = [];
@@ -58,9 +60,77 @@
             likeStatus: ''
           }
         });
+      }).catch((error) => {
+        alert('Проверьте интернет соединение');
       });
   }
-
+  function postComment(name, text) {
+    fetch(api, {
+      method: 'POST',
+      body: JSON.stringify({
+        forceError: true,
+        text: text
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+          .replaceAll("QUOTE_END", "</div>"),
+        name: name
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;"),
+      })
+    })
+      .then((response) => {
+        if (response.status === 400) {
+          formNameValue = name
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+            .replaceAll("QUOTE_END", "</div>");
+          formTextValue = text
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+          alert('Значение полей "Имя" и "Текст" должны содержать минимум 3 символа');
+        } else if (response.status === 500) {
+          formNameValue = name
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+            .replaceAll("QUOTE_END", "</div>");
+          formTextValue = text
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+            postComment(name, text);
+          // alert('Сервер сломался, попробуйте позже!');
+        }
+        else {
+          formNameValue = '';
+          formTextValue = '';
+          return response.json();
+        }
+      })
+      .then((responseData) => {
+        console.log(responseData);
+        getComment().then(() => {
+          isLoading = false;
+          commentsRenderer();
+          addFormRenderer();
+          initAddForm();
+        })
+      }).catch((error) => {
+        isLoading = false;
+        formNameValue = name
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+          .replaceAll("QUOTE_END", "</div>");
+        formTextValue = text
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+        addFormRenderer();
+        initAddForm();
+        alert('Проверьте интернет соединение');
+      });;
+  }
   addFormButton.disabled = true;
   addFormName.addEventListener('input', checkFields);
   addFormText.addEventListener('input', checkFields);
@@ -73,8 +143,8 @@
   }
   function addFormRenderer() {
     if (isLoading === false) {
-      addForm.innerHTML = ` <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
-      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
+      addForm.innerHTML = ` <input type="text" class="add-form-name" value = '${formNameValue}' placeholder="Введите ваше имя" />
+      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4">${formTextValue}</textarea>
       <div class="add-form-row">
         <button class="add-form-button">Написать</button>
         <button class="remove-form-button">Удалить последний комментарий</button>
@@ -245,31 +315,7 @@
       isLoading = true;
       addFormRenderer();
       console.log(isLoading);
-      fetch(api, {
-        method: 'POST',
-        body: JSON.stringify({
-          text: addFormText.value
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-            .replaceAll("QUOTE_END", "</div>"),
-          name: addFormName.value
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;"),
-        })
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((responseData) => {
-          console.log(responseData);
-          getComment().then(() => {
-            isLoading = false;
-            commentsRenderer()
-            addFormRenderer();
-            initAddForm();
-          })
-        });
+      postComment(addFormName.value, addFormText.value);
 
       addFormText.value = '';
       addFormName.value = '';
@@ -295,6 +341,7 @@
     addFormText.addEventListener('input', checkFields);
     addFormButton.addEventListener('click', pushComment);
     removeCommentButton.addEventListener('click', removeComment);
+    (addFormName.value.trim().length != 0 && addFormText.value.trim().length != 0) ? addFormButton.disabled = false : addFormButton.disabled = true;
   }
   addFormButton.addEventListener('click', pushComment);
   removeCommentButton.addEventListener('click', removeComment);
