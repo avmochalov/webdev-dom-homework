@@ -99,23 +99,23 @@
           formTextValue = text
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;");
-            postComment(name, text);
+          postComment(name, text);
           // alert('Сервер сломался, попробуйте позже!');
         }
         else {
           formNameValue = '';
           formTextValue = '';
+          getComment().then(() => {
+            isLoading = false;
+            commentsRenderer();
+            addFormRenderer();
+            initAddForm();
+          })
           return response.json();
         }
       })
       .then((responseData) => {
         console.log(responseData);
-        getComment().then(() => {
-          isLoading = false;
-          commentsRenderer();
-          addFormRenderer();
-          initAddForm();
-        })
       }).catch((error) => {
         isLoading = false;
         formNameValue = name
