@@ -123,7 +123,7 @@ body {
 }
 
 .loader {
-  margin-left: 218px;
+  /* margin-left: 218px; */
   height: 80px;
   width: 120px;
 }
@@ -133,11 +133,62 @@ body {
   width: 120px;
 }
 
+.forms {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .add-form {
   padding: 20px;
   margin-top: 48px;
   display: flex;
   flex-direction: column;
+  /* align-items: center; */
+}
+
+.login__input,
+.pwd__input {
+  width: 512px;
+  font-size: 16px;
+  font-family: Helvetica;
+  border-radius: 8px;
+  border: none;
+  padding: 11px 22px;
+}
+
+.login-button {
+  width: 556px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 16px;
+  font-family: Helvetica;
+  border-radius: 8px;
+  border: none;
+  padding: 11px 22px;
+  background-color: #bcec30;
+  border: none;
+}
+
+.reg-button {
+  margin-left: 178px;
+  width: 200px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  margin-top: 20px;
+  font-size: 16px;
+  text-decoration: underline;
+  color: white;
+}
+
+.login-span {
+  padding-top: 20px;
+}
+
+.login-span-link {
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .add-form-name,
@@ -146,6 +197,7 @@ body {
   font-family: Helvetica;
   border-radius: 8px;
   border: none;
+  padding: 11px 22px;
 }
 
 .add-form-name {

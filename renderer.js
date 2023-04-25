@@ -1,27 +1,56 @@
 const comments = document.querySelector('.comments');
 import { isLoading, formNameValue, formTextValue, commentsArray, getComment } from "./api.js";
-import { addForm, likeEventListener, editEventListener, addCommentAnswerListener } from "./main.js";
+import { loginFromRenderer } from "./auth-component.js";
+import { forms, likeEventListener, editEventListener, addCommentAnswerListener, initAddForm } from "./main.js";
 function firstAppLoad() {
-    comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`
-    getComment().then(() => {
-        commentsRenderer();
-    })
+  comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`
+  getComment().then(() => {
+    commentsRenderer();
+  })
 }
-function addFormRenderer() {
-    if (isLoading === false) {
-        addForm.innerHTML = ` <input type="text" class="add-form-name" value = '${formNameValue}' placeholder="Введите ваше имя" />
+export function commentFromRenderer({ token }) {
+  if (!token) {
+    forms.innerHTML = `<div class="login-span">Чтобы добавить комментарий, <span class="login-span-link">авторизуйтесь!</span> </div>`
+    document.querySelector('.login-span-link').addEventListener('click', () => {
+      loginFromRenderer();
+    })
+  } else {
+    forms.innerHTML = `     <div class="add-form">
+    <input type="text" disabled class="add-form-name" value = '${formNameValue}' placeholder="Введите ваше имя" />
       <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4">${formTextValue}</textarea>
       <div class="add-form-row">
         <button class="add-form-button">Написать</button>
         <button class="remove-form-button">Удалить последний комментарий</button>
+      </div>
       </div>`
-    } else {
-        addForm.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
-    }
+  }
+}
+
+function commentsUploadRenderer() {
+  if (isLoading === false) {
+    forms.innerHTML = `<div class="add-form">
+    <input type="text" disabled class="add-form-name" value = '${formNameValue}' placeholder="Введите ваше имя" />
+      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4">${formTextValue}</textarea>
+      <div class="add-form-row">
+        <button class="add-form-button">Написать</button>
+        <button class="remove-form-button">Удалить последний комментарий</button>
+      </div>
+      </div>`
+  } else {
+    forms.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
+    initAddForm();
+    addFormButton.disabled = true;
+    removeCommentButton.addEventListener('click', removeComment);
+    addFormName.addEventListener('input', checkFields);
+    addFormText.addEventListener('input', checkFields);
+    addFormButton.addEventListener('click', pushComment);
+  }
+
 }
 function commentsRenderer() {
-    const newCommentsSet = commentsArray.map((comment, index) => {
-        return `<li class="comment" data-commentid='${index}'>
+  console.log(commentsArray);
+  const newCommentsSet = commentsArray.map((comment, index) => {
+    return `<li class="comment" data-commentid='${index}'>
         <div class="comment-header">
           <div>${comment.name}</div>
           <div>${comment.date}</div>
@@ -40,10 +69,10 @@ function commentsRenderer() {
         </div>
       </li>`
 
-    }).join('');
-    comments.innerHTML = newCommentsSet;
-    likeEventListener();
-    editEventListener();
-    addCommentAnswerListener();
+  }).join('');
+  comments.innerHTML = newCommentsSet;
+  likeEventListener();
+  editEventListener();
+  addCommentAnswerListener();
 }
-export { addFormRenderer, commentsRenderer, firstAppLoad, comments };
+export { commentsUploadRenderer, commentsRenderer, firstAppLoad, comments };

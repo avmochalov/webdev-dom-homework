@@ -1,11 +1,12 @@
-const api = 'https://webdev-hw-api.vercel.app/api/v1/alex-mochalov/comments';
+const api = 'https://webdev-hw-api.vercel.app/api/v2/alex-mochalov/comments';
+const authApi = 'https://webdev-hw-api.vercel.app/api/user';
 let commentsArray = [];
 let isLoading = false;
-let formNameValue = String();
 let formTextValue = String();
+import { formNameValue } from "./auth-component.js";
 import date from "./date.js";
-import { commentsRenderer, initAddForm } from "./main.js";
-import { addFormRenderer } from "./renderer.js";
+import { commentsRenderer, initAddForm, token } from "./main.js";
+import { commentsUploadRenderer } from "./renderer.js";
 
 
 function getComment() {
@@ -32,7 +33,7 @@ function getComment() {
         });
 }
 
-function postComment(name, text) {
+function postComment(text) {
     fetch(api, {
         method: 'POST',
         body: JSON.stringify({
@@ -42,44 +43,33 @@ function postComment(name, text) {
                 .replaceAll(">", "&gt;")
                 .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
                 .replaceAll("QUOTE_END", "</div>"),
-            name: name
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;"),
-        })
+        }),
+        headers: {
+            Authorization: token,
+        },
     })
         .then((response) => {
             if (response.status === 400) {
-                formNameValue = name
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-                    .replaceAll("QUOTE_END", "</div>");
                 formTextValue = text
                     .replaceAll("<", "&lt;")
                     .replaceAll(">", "&gt;");
                 alert('Значение полей "Имя" и "Текст" должны содержать минимум 3 символа');
                 isLoading = false;
-                addFormRenderer();
+                commentsUploadRenderer();
                 initAddForm();
             } else if (response.status === 500) {
-                formNameValue = name
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-                    .replaceAll("QUOTE_END", "</div>");
                 formTextValue = text
                     .replaceAll("<", "&lt;")
                     .replaceAll(">", "&gt;");
-                postComment(name, text);
+                postComment(text);
                 // alert('Сервер сломался, попробуйте позже!');
             }
             else {
-                formNameValue = '';
                 formTextValue = '';
                 getComment().then(() => {
                     isLoading = false;
                     commentsRenderer();
-                    addFormRenderer();
+                    commentsUploadRenderer();
                     initAddForm();
                 })
                 return response.json();
@@ -89,17 +79,28 @@ function postComment(name, text) {
             console.log(responseData);
         }).catch((error) => {
             isLoading = false;
-            formNameValue = name
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-                .replaceAll("QUOTE_END", "</div>");
             formTextValue = text
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
-            addFormRenderer();
+            commentsUploadRenderer();
             initAddForm();
             alert('Проверьте интернет соединение');
         });;
+}
+
+export function authUser({ login, password }) {
+    return fetch(`${authApi}/login`, {
+        method: 'POST',
+        body: JSON.stringify({
+            login,
+            password
+        })
+    })
+        .then((response) => {
+            // if (response.status === 400) {
+            //     throw new Error('400')
+            // }
+            return response.json();
+        })
 }
 export { commentsArray, isLoading, formNameValue, formTextValue, getComment, postComment };

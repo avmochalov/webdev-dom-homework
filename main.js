@@ -2,17 +2,35 @@ let addFormButton;
 let removeCommentButton;
 let addFormName;
 let addFormText;
-const addForm = document.querySelector('.add-form');
-
-addFormRenderer();
-initAddForm();
+const forms = document.querySelector('.forms');
+const appHtml = document.querySelector('.add-form');
+let token = 0;
+console.log(token);
 firstAppLoad();
 
-import { addFormRenderer,commentsRenderer, comments, firstAppLoad } from "./renderer.js";
-import { getComment, postComment, commentsArray, isLoading, formNameValue,formTextValue } from "./api.js";
-addFormButton.disabled = true;
-addFormName.addEventListener('input', checkFields);
-addFormText.addEventListener('input', checkFields);
+import { commentsUploadRenderer, commentsRenderer, comments, firstAppLoad, commentFromRenderer } from "./renderer.js";
+import { getComment, postComment, commentsArray, isLoading, formNameValue, formTextValue } from "./api.js";
+import { loginFromRenderer } from "./auth-component.js";
+
+appRenderer();
+function setToken(newToken) {
+        token = newToken;
+}
+function appRenderer() {
+    if (!token) {
+        getComment().then(() => {
+            commentsRenderer();
+            commentFromRenderer({ token });
+        });
+    } else {
+        getComment().then(() => {
+            commentsRenderer();
+            commentFromRenderer({ token });
+            initAddForm();
+        });
+
+    }
+}
 function delay(interval = 3000) {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -131,9 +149,9 @@ function pushComment() {
     if (addFormName.value === '' || addFormText.value === '') {
         return;
     } else {
-        addForm.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
+        forms.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
         console.log(isLoading);
-        postComment(addFormName.value, addFormText.value);
+        postComment(addFormText.value);
 
         addFormText.value = '';
         addFormName.value = '';
@@ -161,11 +179,9 @@ function initAddForm() {
     removeCommentButton.addEventListener('click', removeComment);
     (addFormName.value.trim().length != 0 && addFormText.value.trim().length != 0) ? addFormButton.disabled = false : addFormButton.disabled = true;
 }
-addFormButton.addEventListener('click', pushComment);
-removeCommentButton.addEventListener('click', removeComment);
 document.addEventListener('keyup', (event) => {
     if (event.keyCode === 13) {
         pushComment();
     }
 });
-export { commentsRenderer, addFormRenderer, initAddForm, addForm, likeEventListener, editEventListener, addCommentAnswerListener };
+export { setToken, token, appRenderer, commentsRenderer, commentsUploadRenderer, initAddForm, forms, likeEventListener, editEventListener, addCommentAnswerListener };
