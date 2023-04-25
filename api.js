@@ -3,7 +3,6 @@ const authApi = 'https://webdev-hw-api.vercel.app/api/user';
 let commentsArray = [];
 let isLoading = false;
 let formTextValue = String();
-import { formNameValue } from "./auth-component.js";
 import date from "./date.js";
 import { commentsRenderer, initAddForm, token } from "./main.js";
 import { commentsUploadRenderer } from "./renderer.js";
@@ -117,4 +116,4 @@ export function regUser({ login, name, password }) {
             return response.json();
         })
 }
-export { commentsArray, isLoading, formNameValue, formTextValue, getComment, postComment };
+export { commentsArray, isLoading, formTextValue, getComment, postComment };

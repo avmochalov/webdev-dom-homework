@@ -1,7 +1,8 @@
 const comments = document.querySelector('.comments');
-import { isLoading, formNameValue, formTextValue, commentsArray, getComment } from "./api.js";
+import { isLoading, formTextValue, commentsArray, getComment } from "./api.js";
 import { loginFromRenderer } from "./auth-component.js";
 import { forms, likeEventListener, editEventListener, addCommentAnswerListener, initAddForm } from "./main.js";
+let formNameValue = window.localStorage.getItem('name');
 function firstAppLoad() {
   comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`
   getComment().then(() => {
@@ -15,6 +16,7 @@ export function commentFromRenderer({ token }) {
       loginFromRenderer();
     })
   } else {
+    formNameValue = window.localStorage.getItem('name');
     forms.innerHTML = `     <div class="add-form">
     <input type="text" disabled class="add-form-name" value = '${formNameValue}' placeholder="Введите ваше имя" />
       <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4">${formTextValue}</textarea>

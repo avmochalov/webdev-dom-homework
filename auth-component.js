@@ -2,7 +2,6 @@ import { authUser } from "./api.js";
 import { forms, setToken, token, appRenderer } from "./main.js"
 import { regFromRenderer } from "./reg-component.js";
 import { comments } from "./renderer.js"
-let formNameValue = String();
 export function loginFromRenderer() {
     window.scrollTo(0, 0);
     comments.innerHTML = `<div class="add-form"><input type="text" class="login__input" placeholder="Логин" />
@@ -20,13 +19,12 @@ export function loginFromRenderer() {
         authUser({ login: login, password: password }).then((userData) => {
             console.log(userData);
             setToken(`Bearer ${userData.user.token}`);
-            formNameValue = `${userData.user.name}`
+            window.localStorage.setItem('name', `${userData.user.name}`)
             console.log(token);
             appRenderer();
         })
-        .catch((error) => {
-            alert('Введен неверный логин или пароль');
-        })
+            .catch((error) => {
+                alert('Введен неверный логин или пароль');
+            })
     })
 }
-export { formNameValue };

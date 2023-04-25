@@ -4,17 +4,19 @@ let addFormName;
 let addFormText;
 const forms = document.querySelector('.forms');
 const appHtml = document.querySelector('.add-form');
-let token = 0;
+let token = window.localStorage.getItem('token');
 console.log(token);
 firstAppLoad();
 
 import { commentsUploadRenderer, commentsRenderer, comments, firstAppLoad, commentFromRenderer } from "./renderer.js";
-import { getComment, postComment, commentsArray, isLoading, formNameValue, formTextValue } from "./api.js";
+import { getComment, postComment, commentsArray, isLoading, formTextValue } from "./api.js";
 import { loginFromRenderer } from "./auth-component.js";
 
 appRenderer();
 function setToken(newToken) {
-        token = newToken;
+    window.localStorage.setItem('token', `${newToken}`)
+    token = window.localStorage.getItem('token');
+    console.log(token);
 }
 function appRenderer() {
     if (!token) {
