@@ -128,6 +128,20 @@ body {
   width: 120px;
 }
 
+.reg_img {
+  margin-left: auto;
+  margin-right: auto;
+  height: 80px;
+  width: 80px;
+}
+
+.reg-status {
+  color: white;
+  font-size: 25px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .comments__loader {
   height: 80px;
   width: 120px;
@@ -148,7 +162,8 @@ body {
 }
 
 .login__input,
-.pwd__input {
+.pwd__input,
+.name__input {
   width: 512px;
   font-size: 16px;
   font-family: Helvetica;

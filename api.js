@@ -97,9 +97,23 @@ export function authUser({ login, password }) {
         })
     })
         .then((response) => {
-            // if (response.status === 400) {
-            //     throw new Error('400')
-            // }
+            return response.json();
+        })
+}
+
+export function regUser({ login, name, password }) {
+    return fetch(authApi, {
+        method: 'POST',
+        body: JSON.stringify({
+            login,
+            name,
+            password
+        })
+    })
+        .then((response) => {
+            if (response.status === 400) {
+                throw new Error('400');
+            }
             return response.json();
         })
 }
