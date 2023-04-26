@@ -22,7 +22,7 @@ export function commentFromRenderer({ token }) {
       <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4">${formTextValue}</textarea>
       <div class="add-form-row">
         <button class="add-form-button">Написать</button>
-        <button class="remove-form-button">Удалить последний комментарий</button>
+        <button class="remove-form-button">Выйти</button>
       </div>
       </div>`
   }

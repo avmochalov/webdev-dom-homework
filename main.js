@@ -179,7 +179,10 @@ function initAddForm() {
     addFormName.addEventListener('input', checkFields);
     addFormText.addEventListener('input', checkFields);
     addFormButton.addEventListener('click', pushComment);
-    removeCommentButton.addEventListener('click', removeComment);
+    removeCommentButton.addEventListener('click', () => {
+        window.localStorage.clear();
+        location.reload();
+    });
     (addFormName.value.trim().length != 0 && addFormText.value.trim().length != 0) ? addFormButton.disabled = false : addFormButton.disabled = true;
 }
 document.addEventListener('keyup', (event) => {
