@@ -20,6 +20,7 @@ function getComment() {
             commentsArray = responseData.comments.map((comment) => {
                 return {
                     name: comment.author.name,
+                    id: comment.id,
                     date: date(comment.date),
                     text: comment.text,
                     likes: comment.likes,
@@ -115,5 +116,29 @@ export function regUser({ login, name, password }) {
             }
             return response.json();
         })
+}
+
+export function deleteComment({ id }) {
+    return fetch(api + '/' + id, {
+        method: "DELETE",
+        headers: {
+            Authorization: token,
+        },
+    })
+        .then((response) => {
+            return response.json();
+        });
+}
+
+export function addLike({ id }) {
+    return fetch(api + '/' + id + '/toggle-like', {
+        method: "POST",
+        headers: {
+            Authorization: token,
+        },
+    })
+        .then((response) => {
+            return response.json();
+        });
 }
 export { commentsArray, isLoading, formTextValue, getComment, postComment };

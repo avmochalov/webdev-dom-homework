@@ -25,6 +25,7 @@ function appRenderer() {
             commentFromRenderer({ token });
         });
     } else {
+        comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`;
         getComment().then(() => {
             commentsRenderer();
             commentFromRenderer({ token });
@@ -67,58 +68,58 @@ function saveEventListener() {
         commentsRenderer();
     })
 }
-function editEventListener() {
-    const editButtons = document.querySelectorAll('.edit__button')
-    for (const editButton of editButtons) {
-        editButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const buttonIndex = editButton.dataset.edit;
-            const newCommentsSet = commentsArray.map((comment, index) => {
-                if (Number(buttonIndex) === index) {
-                    return `<li class="comment" data-commentid='${index}'>
-        <div class="comment-header">
-          <div>${comment.name}</div>
-          <div>${comment.date}</div>
-        </div>
-        <div class="comment-body">
-          <textarea type="textarea" class="change-form-text" rows="4">${comment.text}</textarea>
-        </div>
-        <div class="comment-footer">
-          <button class="save__button" data-save='${index}'>Сохранить</button>
-          <div class="likes">
-            <span class="likes-counter">${comment.likes}</span>
-            <button class="like-button" data-like='${index}'></button>
-          </div>
-        </div>
-      </li>`
-                } else {
-                    return `<li class="comment" data-commentid='${index}'>
-        <div class="comment-header">
-          <div>${comment.name}</div>
-          <div>${comment.date}</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">
-            ${comment.text}
-          </div>
-        </div>
-        <div class="comment-footer">
-          <button class="edit__button" data-edit='${index}'>Редактировать</button>
-          <div class="likes">
-            <span class="likes-counter">${comment.likes}</span>
-            <button class="like-button" data-like='${index}'></button>
-          </div>
-        </div>
-      </li>`
-                }
-            }).join('');
-            comments.innerHTML = newCommentsSet;
-            fixEditField();
-            saveEventListener();
-            addCommentAnswerListener();
-        });
-    }
-}
+// function editEventListener() {
+//     const editButtons = document.querySelectorAll('.edit__button')
+//     for (const editButton of editButtons) {
+//         editButton.addEventListener('click', (event) => {
+//             event.stopPropagation();
+//             const buttonIndex = editButton.dataset.edit;
+//             const newCommentsSet = commentsArray.map((comment, index) => {
+//                 if (Number(buttonIndex) === index) {
+//                     return `<li class="comment" data-commentid='${index}'>
+//         <div class="comment-header">
+//           <div>${comment.name}</div>
+//           <div>${comment.date}</div>
+//         </div>
+//         <div class="comment-body">
+//           <textarea type="textarea" class="change-form-text" rows="4">${comment.text}</textarea>
+//         </div>
+//         <div class="comment-footer">
+//           <button class="save__button" data-save='${index}'>Сохранить</button>
+//           <div class="likes">
+//             <span class="likes-counter">${comment.likes}</span>
+//             <button class="like-button" data-like='${index}'></button>
+//           </div>
+//         </div>
+//       </li>`
+//                 } else {
+//                     return `<li class="comment" data-commentid='${index}'>
+//         <div class="comment-header">
+//           <div>${comment.name}</div>
+//           <div>${comment.date}</div>
+//         </div>
+//         <div class="comment-body">
+//           <div class="comment-text">
+//             ${comment.text}
+//           </div>
+//         </div>
+//         <div class="comment-footer">
+//           <button class="edit__button" data-edit='${index}'>Редактировать</button>
+//           <div class="likes">
+//             <span class="likes-counter">${comment.likes}</span>
+//             <button class="like-button" data-like='${index}'></button>
+//           </div>
+//         </div>
+//       </li>`
+//                 }
+//             }).join('');
+//             comments.innerHTML = newCommentsSet;
+//             fixEditField();
+//             saveEventListener();
+//             addCommentAnswerListener();
+//         });
+//     }
+// }
 function likeEventListener() {
     const likeButtons = document.querySelectorAll('.like-button');
     for (const likeButton of likeButtons) {
@@ -186,4 +187,4 @@ document.addEventListener('keyup', (event) => {
         pushComment();
     }
 });
-export { setToken, token, appRenderer, commentsRenderer, commentsUploadRenderer, initAddForm, forms, likeEventListener, editEventListener, addCommentAnswerListener };
+export { setToken, token, appRenderer, commentsRenderer, commentsUploadRenderer, initAddForm, forms, likeEventListener, addCommentAnswerListener };

@@ -1,7 +1,7 @@
 const comments = document.querySelector('.comments');
-import { isLoading, formTextValue, commentsArray, getComment } from "./api.js";
+import { isLoading, formTextValue, commentsArray, getComment, deleteComment } from "./api.js";
 import { loginFromRenderer } from "./auth-component.js";
-import { forms, likeEventListener, editEventListener, addCommentAnswerListener, initAddForm } from "./main.js";
+import { forms, likeEventListener, addCommentAnswerListener, initAddForm, appRenderer } from "./main.js";
 let formNameValue = window.localStorage.getItem('name');
 function firstAppLoad() {
   comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`
@@ -63,18 +63,34 @@ function commentsRenderer() {
           </div>
         </div>
         <div class="comment-footer">
-          <button class="edit__button" data-edit='${index}'>Редактировать</button>
+          <button class="edit__button" data-edit='${comment.id}'>Удалить</button>
           <div class="likes">
             <span class="likes-counter">${comment.likes}</span>
-            <button class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+            <button data-id='${comment.id} class="like-button ${comment.likeStatus}" data-like='${index}'></button>
           </div>
         </div>
       </li>`
 
   }).join('');
   comments.innerHTML = newCommentsSet;
+  const deleteButtons = document.querySelectorAll('.edit__button');
   likeEventListener();
-  editEventListener();
+  // editEventListener();
   addCommentAnswerListener();
+  for (const deleteButton of deleteButtons) {
+    deleteButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const id = deleteButton.dataset.edit;
+      deleteComment({ id })
+        .then((response) => {
+          appRenderer();
+        })
+        .catch((error) => {
+          alert('Не удалось удалить комментарий');
+        });
+    })
+
+  }
+
 }
 export { commentsUploadRenderer, commentsRenderer, firstAppLoad, comments };
