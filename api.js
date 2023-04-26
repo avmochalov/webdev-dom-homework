@@ -10,7 +10,10 @@ import { commentsUploadRenderer } from "./renderer.js";
 
 function getComment() {
     return fetch(api, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            Authorization: token,
+        },
     })
         .then((response) => {
             return response.json();
@@ -24,7 +27,7 @@ function getComment() {
                     date: date(comment.date),
                     text: comment.text,
                     likes: comment.likes,
-                    isLiked: false,
+                    isLiked: comment.isLiked,
                     likeStatus: ''
                 }
             });
@@ -130,15 +133,18 @@ export function deleteComment({ id }) {
         });
 }
 
-export function addLike({ id }) {
-    return fetch(api + '/' + id + '/toggle-like', {
+export function addLike({ likeId }) {
+    console.log(likeId);
+    return fetch(api + '/' + likeId + '/toggle-like', {
         method: "POST",
         headers: {
             Authorization: token,
         },
     })
         .then((response) => {
+            console.log(response);
             return response.json();
+
         });
 }
 export { commentsArray, isLoading, formTextValue, getComment, postComment };

@@ -1,7 +1,7 @@
 const comments = document.querySelector('.comments');
-import { isLoading, formTextValue, commentsArray, getComment, deleteComment } from "./api.js";
+import { isLoading, formTextValue, commentsArray, getComment, deleteComment, addLike } from "./api.js";
 import { loginFromRenderer } from "./auth-component.js";
-import { forms, likeEventListener, addCommentAnswerListener, initAddForm, appRenderer } from "./main.js";
+import { forms, addCommentAnswerListener, initAddForm, appRenderer } from "./main.js";
 let formNameValue = window.localStorage.getItem('name');
 function firstAppLoad() {
   comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`
@@ -66,7 +66,7 @@ function commentsRenderer() {
           <button class="edit__button" data-edit='${comment.id}'>Удалить</button>
           <div class="likes">
             <span class="likes-counter">${comment.likes}</span>
-            <button data-id='${comment.id} class="like-button ${comment.likeStatus}" data-like='${index}'></button>
+            <button class="like-button ${comment.isLiked ? '-active-like' : ' '} " data-like='${comment.id}'></button>
           </div>
         </div>
       </li>`
@@ -74,7 +74,7 @@ function commentsRenderer() {
   }).join('');
   comments.innerHTML = newCommentsSet;
   const deleteButtons = document.querySelectorAll('.edit__button');
-  likeEventListener();
+  // likeEventListener();
   // editEventListener();
   addCommentAnswerListener();
   for (const deleteButton of deleteButtons) {
@@ -83,7 +83,11 @@ function commentsRenderer() {
       const id = deleteButton.dataset.edit;
       deleteComment({ id })
         .then((response) => {
-          appRenderer();
+          getComment().then(() => {
+            commentsRenderer();
+            commentsUploadRenderer();
+            initAddForm();
+          })
         })
         .catch((error) => {
           alert('Не удалось удалить комментарий');
@@ -91,6 +95,22 @@ function commentsRenderer() {
     })
 
   }
-
+  const likeButtons = document.querySelectorAll('.like-button');
+  for (const likeButton of likeButtons) {
+    likeButton.addEventListener('click', (event) => {
+      likeButton.classList.add('loading-like');
+      event.stopPropagation();
+      const likeId = likeButton.dataset.like;
+      console.log(likeId);
+      addLike({ likeId })
+        .then((response) => {
+          getComment().then(() => {
+            commentsRenderer();
+            commentsUploadRenderer();
+            initAddForm();
+          })
+        })
+    })
+  }
 }
 export { commentsUploadRenderer, commentsRenderer, firstAppLoad, comments };
