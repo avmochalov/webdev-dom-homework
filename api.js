@@ -6,7 +6,7 @@ let formTextValue = String();
 import date from "./date.js";
 import { commentsRenderer, initAddForm, token } from "./main.js";
 import { commentsUploadRenderer } from "./renderer.js";
-
+import { format } from "date-fns";
 
 function getComment() {
     return fetch(api, {
@@ -20,11 +20,13 @@ function getComment() {
         })
         .then((responseData) => {
             console.log(responseData);
+
             commentsArray = responseData.comments.map((comment) => {
+                const commentDate = format(new Date(comment.date), 'yyyy-MM-dd hh.mm.ss');
                 return {
                     name: comment.author.name,
                     id: comment.id,
-                    date: date(comment.date),
+                    date: commentDate,
                     text: comment.text,
                     likes: comment.likes,
                     isLiked: comment.isLiked,

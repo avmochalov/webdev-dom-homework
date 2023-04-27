@@ -11,7 +11,6 @@ firstAppLoad();
 import { commentsUploadRenderer, commentsRenderer, comments, firstAppLoad, commentFromRenderer } from "./renderer.js";
 import { getComment, postComment, commentsArray, isLoading, formTextValue } from "./api.js";
 import { loginFromRenderer } from "./auth-component.js";
-import { format } from "date-fns";
 appRenderer();
 function setToken(newToken) {
     window.localStorage.setItem('token', `${newToken}`)
