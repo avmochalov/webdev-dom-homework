@@ -13,18 +13,23 @@ export function loginFromRenderer() {
     document.querySelector('.reg-button').addEventListener('click', () => {
         regFromRenderer();
     });
+    document.querySelector('.login__input').addEventListener
     document.querySelector('.login-button').addEventListener('click', () => {
         let login = document.querySelector('.login__input').value;
         let password = document.querySelector('.pwd__input').value;
-        authUser({ login: login, password: password }).then((userData) => {
-            console.log(userData);
-            setToken(`Bearer ${userData.user.token}`);
-            window.localStorage.setItem('name', `${userData.user.name}`)
-            console.log(token);
-            appRenderer();
-        })
-            .catch((error) => {
-                alert('Введен неверный логин или пароль');
+        if (!login || !password) {
+            alert('Поля логин и пароль не должны быть пустыми!')
+        } else {
+            authUser({ login: login, password: password }).then((userData) => {
+                console.log(userData);
+                setToken(`Bearer ${userData.user.token}`);
+                window.localStorage.setItem('name', `${userData.user.name}`)
+                console.log(token);
+                appRenderer();
             })
+                .catch((error) => {
+                    alert('Введен неверный логин или пароль');
+                })
+        }
     })
 }

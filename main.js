@@ -145,8 +145,7 @@ function editEventListener() {
 
 // }
 function checkFields() {
-    (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;  //Добавил удаление пробелов, чтобы пользователь не мог отправить сообщение из пробелов
-
+    (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;
 }
 function pushComment() {
     if (addFormName.value === '' || addFormText.value === '') {

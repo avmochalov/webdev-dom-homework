@@ -17,16 +17,21 @@ export function regFromRenderer() {
         let name = document.querySelector('.name__input').value;
         let login = document.querySelector('.login__input').value;
         let password = document.querySelector('.pwd__input').value;
-        regUser({ login: login, name: name, password: password }).then((regResult) => {
-            console.log(regResult);
-            comments.innerHTML = `<div class="add-form">
-            <img src="./check.png" alt="" class="reg_img">
-            <div class="reg-status">Регистрация прошла успешно!</div>
-            </div>`
-            setTimeout(loginFromRenderer, 3000);
-        })
-            .catch((error) => {
-                alert('Такой пользователь уже существует')
-            });
+        if (!name || !login || !password) {
+            alert('Заполните все поля');
+        } else {
+            regUser({ login: login, name: name, password: password }).then((regResult) => {
+                console.log(regResult);
+                comments.innerHTML = `<div class="add-form">
+                <img src="./check.png" alt="" class="reg_img">
+                <div class="reg-status">Регистрация прошла успешно!</div>
+                </div>`
+                setTimeout(loginFromRenderer, 3000);
+            })
+                .catch((error) => {
+                    alert('Такой пользователь уже существует')
+                });
+        }
+
     })
 }
