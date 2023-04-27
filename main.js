@@ -2,18 +2,38 @@ let addFormButton;
 let removeCommentButton;
 let addFormName;
 let addFormText;
-const addForm = document.querySelector('.add-form');
-
-addFormRenderer();
-initAddForm();
+const forms = document.querySelector('.forms');
+const appHtml = document.querySelector('.add-form');
+let token = window.localStorage.getItem('token');
+console.log(token);
 firstAppLoad();
 
-import { addFormRenderer,commentsRenderer, comments, firstAppLoad } from "./renderer.js";
-import { getComment, postComment, commentsArray, isLoading, formNameValue,formTextValue } from "./api.js";
-addFormButton.disabled = true;
-addFormName.addEventListener('input', checkFields);
-addFormText.addEventListener('input', checkFields);
-function delay(interval = 3000) {
+import { commentsUploadRenderer, commentsRenderer, comments, firstAppLoad, commentFromRenderer } from "./renderer.js";
+import { getComment, postComment, commentsArray, isLoading, formTextValue } from "./api.js";
+import { loginFromRenderer } from "./auth-component.js";
+appRenderer();
+function setToken(newToken) {
+    window.localStorage.setItem('token', `${newToken}`)
+    token = window.localStorage.getItem('token');
+    console.log(token);
+}
+function appRenderer() {
+    if (!token) {
+        getComment().then(() => {
+            commentsRenderer();
+            commentFromRenderer({ token });
+        });
+    } else {
+        comments.innerHTML = `<img class="comments__loader" src="./loader2.gif" alt="loader">`;
+        getComment().then(() => {
+            commentsRenderer();
+            commentFromRenderer({ token });
+            initAddForm();
+        });
+
+    }
+}
+function delay(interval = 1000) {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve();
@@ -48,7 +68,7 @@ function saveEventListener() {
     })
 }
 function editEventListener() {
-    const editButtons = document.querySelectorAll('.edit__button')
+    const editButtons = document.querySelectorAll('.edit__button');
     for (const editButton of editButtons) {
         editButton.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -99,41 +119,40 @@ function editEventListener() {
         });
     }
 }
-function likeEventListener() {
-    const likeButtons = document.querySelectorAll('.like-button');
-    for (const likeButton of likeButtons) {
-        likeButton.addEventListener('click', (event) => {
-            console.log(event);
-            event.stopPropagation();
-            const buttonIndex = likeButton.dataset.like;
-            likeButton.classList.add('loading-like');
-            console.log(likeButton);
-            delay().then(() => {
-                if (commentsArray[buttonIndex].likeStatus === '') {
-                    commentsArray[buttonIndex].likeStatus = '-active-like';
-                    commentsArray[buttonIndex].likes = ++commentsArray[buttonIndex].likes;
-                } else {
-                    commentsArray[buttonIndex].likeStatus = '';
-                    commentsArray[buttonIndex].likes = --commentsArray[buttonIndex].likes;
-                }
-                commentsRenderer();
-            })
+// function likeEventListener() {
+//     const likeButtons = document.querySelectorAll('.like-button');
+//     for (const likeButton of likeButtons) {
+//         likeButton.addEventListener('click', (event) => {
+//             console.log(event);
+//             event.stopPropagation();
+//             const buttonIndex = likeButton.dataset.like;
+//             likeButton.classList.add('loading-like');
+//             console.log(likeButton);
+//             delay().then(() => {
+//                 if (commentsArray[buttonIndex].isLiked === false) {
+//                     commentsArray[buttonIndex].likeStatus = '-active-like';
+//                     commentsArray[buttonIndex].likes = ++commentsArray[buttonIndex].likes;
+//                 } else {
+//                     commentsArray[buttonIndex].likeStatus = '';
+//                     commentsArray[buttonIndex].likes = --commentsArray[buttonIndex].likes;
+//                 }
+//                 commentsRenderer();
+//             })
 
-        });
-    }
+//         });
+//     }
 
-}
+// }
 function checkFields() {
-    (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;  //Добавил удаление пробелов, чтобы пользователь не мог отправить сообщение из пробелов
-
+    (addFormName.value.trim() != '' && addFormText.value.trim() != '') ? addFormButton.disabled = false : addFormButton.disabled = true;
 }
 function pushComment() {
     if (addFormName.value === '' || addFormText.value === '') {
         return;
     } else {
-        addForm.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
+        forms.innerHTML = `<img class="loader" src="./loader2.gif" alt="loader">`
         console.log(isLoading);
-        postComment(addFormName.value, addFormText.value);
+        postComment(addFormText.value);
 
         addFormText.value = '';
         addFormName.value = '';
@@ -158,14 +177,15 @@ function initAddForm() {
     addFormName.addEventListener('input', checkFields);
     addFormText.addEventListener('input', checkFields);
     addFormButton.addEventListener('click', pushComment);
-    removeCommentButton.addEventListener('click', removeComment);
+    removeCommentButton.addEventListener('click', () => {
+        window.localStorage.clear();
+        location.reload();
+    });
     (addFormName.value.trim().length != 0 && addFormText.value.trim().length != 0) ? addFormButton.disabled = false : addFormButton.disabled = true;
 }
-addFormButton.addEventListener('click', pushComment);
-removeCommentButton.addEventListener('click', removeComment);
 document.addEventListener('keyup', (event) => {
     if (event.keyCode === 13) {
         pushComment();
     }
 });
-export { commentsRenderer, addFormRenderer, initAddForm, addForm, likeEventListener, editEventListener, addCommentAnswerListener };
+export { setToken, token, appRenderer, commentsRenderer, commentsUploadRenderer, initAddForm, forms, addCommentAnswerListener };
