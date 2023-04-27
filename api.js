@@ -1,16 +1,19 @@
-const api = 'https://webdev-hw-api.vercel.app/api/v1/alex-mochalov/comments';
+const api = 'https://webdev-hw-api.vercel.app/api/v2/alex-mochalov/comments';
+const authApi = 'https://webdev-hw-api.vercel.app/api/user';
 let commentsArray = [];
 let isLoading = false;
-let formNameValue = String();
 let formTextValue = String();
 import date from "./date.js";
-import { commentsRenderer, initAddForm } from "./main.js";
-import { addFormRenderer } from "./renderer.js";
+import { commentsRenderer, initAddForm, token } from "./main.js";
+import { commentsUploadRenderer } from "./renderer.js";
 
 
 function getComment() {
     return fetch(api, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            Authorization: token,
+        },
     })
         .then((response) => {
             return response.json();
@@ -20,10 +23,11 @@ function getComment() {
             commentsArray = responseData.comments.map((comment) => {
                 return {
                     name: comment.author.name,
+                    id: comment.id,
                     date: date(comment.date),
                     text: comment.text,
                     likes: comment.likes,
-                    isLiked: false,
+                    isLiked: comment.isLiked,
                     likeStatus: ''
                 }
             });
@@ -32,7 +36,7 @@ function getComment() {
         });
 }
 
-function postComment(name, text) {
+function postComment(text) {
     fetch(api, {
         method: 'POST',
         body: JSON.stringify({
@@ -42,44 +46,33 @@ function postComment(name, text) {
                 .replaceAll(">", "&gt;")
                 .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
                 .replaceAll("QUOTE_END", "</div>"),
-            name: name
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;"),
-        })
+        }),
+        headers: {
+            Authorization: token,
+        },
     })
         .then((response) => {
             if (response.status === 400) {
-                formNameValue = name
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-                    .replaceAll("QUOTE_END", "</div>");
                 formTextValue = text
                     .replaceAll("<", "&lt;")
                     .replaceAll(">", "&gt;");
                 alert('Значение полей "Имя" и "Текст" должны содержать минимум 3 символа');
                 isLoading = false;
-                addFormRenderer();
+                commentsUploadRenderer();
                 initAddForm();
             } else if (response.status === 500) {
-                formNameValue = name
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-                    .replaceAll("QUOTE_END", "</div>");
                 formTextValue = text
                     .replaceAll("<", "&lt;")
                     .replaceAll(">", "&gt;");
-                postComment(name, text);
+                postComment(text);
                 // alert('Сервер сломался, попробуйте позже!');
             }
             else {
-                formNameValue = '';
                 formTextValue = '';
                 getComment().then(() => {
                     isLoading = false;
                     commentsRenderer();
-                    addFormRenderer();
+                    commentsUploadRenderer();
                     initAddForm();
                 })
                 return response.json();
@@ -89,17 +82,69 @@ function postComment(name, text) {
             console.log(responseData);
         }).catch((error) => {
             isLoading = false;
-            formNameValue = name
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-                .replaceAll("QUOTE_END", "</div>");
             formTextValue = text
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
-            addFormRenderer();
+            commentsUploadRenderer();
             initAddForm();
             alert('Проверьте интернет соединение');
         });;
 }
-export { commentsArray, isLoading, formNameValue, formTextValue, getComment, postComment };
+
+export function authUser({ login, password }) {
+    return fetch(`${authApi}/login`, {
+        method: 'POST',
+        body: JSON.stringify({
+            login,
+            password
+        })
+    })
+        .then((response) => {
+            return response.json();
+        })
+}
+
+export function regUser({ login, name, password }) {
+    return fetch(authApi, {
+        method: 'POST',
+        body: JSON.stringify({
+            login,
+            name,
+            password
+        })
+    })
+        .then((response) => {
+            if (response.status === 400) {
+                throw new Error('400');
+            }
+            return response.json();
+        })
+}
+
+export function deleteComment({ id }) {
+    return fetch(api + '/' + id, {
+        method: "DELETE",
+        headers: {
+            Authorization: token,
+        },
+    })
+        .then((response) => {
+            return response.json();
+        });
+}
+
+export function addLike({ likeId }) {
+    console.log(likeId);
+    return fetch(api + '/' + likeId + '/toggle-like', {
+        method: "POST",
+        headers: {
+            Authorization: token,
+        },
+    })
+        .then((response) => {
+            console.log(response);
+            return response.json();
+
+        });
+}
+export { commentsArray, isLoading, formTextValue, getComment, postComment };
